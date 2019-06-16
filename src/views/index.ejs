@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Url Scrape Tools</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+        <style>
+            .container {
+                padding-top: 60px;
+            }
+            
+            #metaPreId {
+                margin-top: 30px;
+            }
+
+            .loading {
+                display:none;width: 69px;position: absolute;
+                top: 50%;
+                left: 46%;
+                padding: 2px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="panel-group">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><b>URL SCRAPE TOOL</b></div>
+                    <div class="panel-body">
+                              <div class="form-group">
+                                <label for="url">Input URL:</label>
+                                <input type="url" class="form-control" id="url" placeholder="Please give your input URL" name="input-url">
+                              </div>
+                              <div>
+                                 <button type="submit" id="exist-scrape-data-btn" class="btn btn-primary">Show existing scrape information</button>
+                                 <button type="submit" id="new-scrape-data-btn" class="btn btn-primary">Fetch new scrape information</button>
+                              </div>
+                              <pre id="metaPreId"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="wait" class="loading"><img src='/images/loading.gif' width="64" height="64" /><br>Loading..</div>
+    </body>
+    <script>
+        $(document).ready(function(){
+            $('#metaPreId').hide();
+        });
+
+        $('#exist-scrape-data-btn').click(function(){
+            $("#wait").css("display", "block");
+            $.ajax({
+                type: 'POST',
+                url: '/getExistingScrapeData',
+                data: {
+                    url: $('#url').val()
+                },
+                success: function (data) {
+                    $("#wait").css("display", "none");
+                    $('#metaPreId').show();
+                    if(Object.keys(data).length > 0) {
+                        if(data.Error) {
+                            $('#metaPreId').text(data.Error)
+                        } else {
+                            $('#metaPreId').text(JSON.stringify(data,null,'\t'))
+                        }
+                    } else {
+                        $('#metaPreId').text('Error parsing input url, or no data was scraped.')
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + error.message);
+                }
+            })
+        });
+
+        $('#new-scrape-data-btn').click(function(){
+            $("#wait").css("display", "block");
+            $.ajax({
+                type: 'POST',
+                url: '/getNewWebScrapeData',
+                data: {
+                    url: $('#url').val()
+                },
+                success: function (data) {
+                    $("#wait").css("display", "none");
+                    $('#metaPreId').show();
+                    if(Object.keys(data).length > 0) {
+                        if(data.Error) {
+                            $('#metaPreId').text(data.Error)
+                        } else {
+                            $('#metaPreId').text(JSON.stringify(data,null,'\t'))
+                        }
+                    } else {
+                        $('#metaPreId').text('Error parsing input url, or no data was scraped.')
+                    }
+                },
+                error: function (xhr, status, error) {
+                    alert('Error: ' + error.message);
+                }
+            })
+        });
+    </script>
+</html>
